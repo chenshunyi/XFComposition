@@ -121,7 +121,7 @@
 //                                                           error:error
 //                                                     resultBlock:resultBlock];
 //                       }];
-            break;
+//            break;
         }
         case NetworkRequestTypePostImg: {
             

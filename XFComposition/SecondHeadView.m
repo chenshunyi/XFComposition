@@ -11,7 +11,7 @@
 @implementation SecondHeadView
 -(instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
-        UILabel *topLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WidthFrame, 2)];
+        UILabel *topLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WidthFrame, 1)];
         topLabel.backgroundColor = UIColorFromRGBA(220, 220, 220, 1.0f);
         [self addSubview:topLabel];
         
@@ -32,21 +32,16 @@
         [self addSubview: self.Titlebt];
         
         self.moreBt = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.moreBt.frame = CGRectMake(WidthFrame-20-30, 10, 30, 20);
-        
-        self.moreBt.sd_layout.topSpaceToView(self, 10).rightSpaceToView(self, 20).heightIs(20);
         
         [self.moreBt setTitle:@"更多" forState:UIControlStateNormal];
         self.moreBt.backgroundColor = UIColorFromRGBA(106, 154, 255, 1.0f);
-        self.moreBt.titleLabel.font = [UIFont systemFontOfSize:9];
-        self.moreBt.layer.cornerRadius = 6;
+        self.moreBt.titleLabel.font = [UIFont systemFontOfSize:10];
+        self.moreBt.layer.cornerRadius = 9;
         self.moreBt.clipsToBounds = YES;
-        
         [self addSubview:self.moreBt];
+        self.moreBt.sd_layout.topSpaceToView(self, 10).rightSpaceToView(self, 10).heightIs(18).widthIs(30);
     }
     return self;
 }
-//-(void)more{
-//    
-//}
+
 @end

@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface SynchroClassViewController : UIViewController
-
+@property (nonatomic,copy) NSString *changeId;
 @end

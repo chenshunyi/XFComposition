@@ -15,7 +15,7 @@
 
 @end
 @implementation CommWriteListRequst
--(void)Comm_GetWriteListrequstWithindex :(NSString *)pageIndex withpagesiz:(NSString *)pagesize withgradid:(NSString *)gardeID withtypeid:(NSString *)typeID withishot:(NSString *)ishost withtuijian:(NSString *)istuijian withlabelid:(NSString *)labelId withkeword:(NSString *)keyWord  BlogStatic :(NSString *)BlogStatic  :(GetwiritlistRequst)block{
+-(void)Comm_GetWriteListrequstWithindex :(NSNumber *)pageIndex withpagesiz:(NSString *)pagesize withgradid:(NSString *)gardeID withtypeid:(NSString *)typeID withishot:(NSString *)ishost withtuijian:(NSString *)istuijian withlabelid:(NSString *)labelId withkeword:(NSString *)keyWord  BlogStatic :(NSString *)BlogStatic  :(GetwiritlistRequst)block{
     [SVProgressHUD showWithStatus:@"正在加载..."];
     AFNetworkRequest *requst =[[AFNetworkRequest alloc]init];
     requst.datasource = self;
@@ -29,8 +29,8 @@
                                  @"ishost":ishost,
                                  @"istuijian":istuijian,
                                  @"BlogStatic":BlogStatic,
-//                                 @"keyword":keyWord
-                                 
+                                 @"keyword":keyWord,
+                                 @"labelid":labelId
                                  };
     [requst requestWithURLString:APIurl parameters:parameters type:NetworkRequestTypePost imgData:nil resultBlock:^(id responseObject, NSError *error, NSURLSessionDataTask *task) {
         

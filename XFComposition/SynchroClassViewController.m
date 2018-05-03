@@ -15,10 +15,18 @@
 #import "WriteListModel.h"
 #import "MicoThridCell.h"
 #import "MicrodetailController.h"
-@interface SynchroClassViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UITableViewDataSource,UITableViewDelegate>
+#import "TopMenuView.h"
+
+@interface SynchroClassViewController ()<UICollectionViewDelegate,UICollectionViewDataSource> {
+    UIButton *_oneBtn,*_twoBtn;
+    BOOL _isFresh;
+    NSInteger _page;
+}
+@property (nonatomic,strong) UIView *topBackView;
 @property (nonatomic,strong)UICollectionView *collectionView;
-@property (nonatomic,strong)UITableView *tableView;
+//@property (nonatomic,strong)UITableView *tableView;
 @property (nonatomic,strong)UIView *headView;
+@property (nonatomic,strong)TopMenuView *menuView;
 @property (nonatomic,strong)NSString *Fristparameter;
 @property (nonatomic,strong)NSString *Secondeparameter;
 @property (nonatomic,strong)NSString *Thridparameter;
@@ -33,12 +41,15 @@
 @property (nonatomic,strong)NSMutableArray *btnArray1;
 @property (nonatomic,strong)NSMutableArray *btnArray2;
 @property (nonatomic,strong)NSMutableArray *btnArray3;
+
+@property (nonatomic,strong)UIButton *selectBtn;
+@property (nonatomic,strong)UIButton *threeBtn;
 @end
 
 @implementation SynchroClassViewController
 -(NSArray *)classArray{
     if (!_classArray) {
-        _classArray = @[@"所有课程",@"即将进行",@"正在进行",@"结束课程"];
+        _classArray = @[@"所有课程",@"即将进行",@"正在进行",@"已经结束"];
     }
     return _classArray;
 }
@@ -48,171 +59,122 @@
     }
     return _array3;
 }
--(UITableView *)tableView {
-    if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, WidthFrame, 215)];
-        _tableView.delegate = self;
-        _tableView.dataSource = self;
-        _tableView.scrollEnabled = NO;
-        [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
-//        [_tableView registerClass:[ThidTableViewCell class] forCellReuseIdentifier:@"cell2"];
-    }
-    return _tableView;
-}
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 3;
-}
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;  
-    if (indexPath.row == 0) {
-        for (int i = 0; i<self.classArray.count; i++) {
+- (UIView *)topBackView {
+    if (!_topBackView) {
+        _topBackView = [[UIView alloc] initWithFrame:CGRectMake(0, kLayoutViewMarginTop, kScreenWidth, 40)];
+        _topBackView.backgroundColor = [UIColor whiteColor];
+        
+        
+        
+        NSArray *arr = @[@"所有课程",@"所有分类",@"所有年级"];
+        for (int i = 0; i<arr.count; i++) {
             UIButton *bt = [UIButton buttonWithType:UIButtonTypeCustom];
-            bt.frame = CGRectMake(40+(60+30)*i, 8, 60, 30);
+            bt.frame = CGRectMake((kScreenWidth/3.f)*i, 0, kScreenWidth/3.f, _topBackView.height);
             bt.tag = 1000+i;
+            bt.backgroundColor = [UIColor whiteColor];
+            [bt setTitle:arr[i] forState:UIControlStateNormal];
+            [bt setTitleColor:[UIColor colorWithHexString:@"323232"] forState:UIControlStateNormal];
+            [bt setImage:[UIImage imageNamed:@"bottomJianTou"] forState:UIControlStateNormal];
+            [bt addTarget:self action:@selector(topMenuClick:) forControlEvents:UIControlEventTouchUpInside];
+            bt.titleLabel.font = [UIFont systemFontOfSize:16];
+            [_topBackView addSubview:bt];
             
-            bt.layer.cornerRadius = 6;
-            bt.clipsToBounds = YES;
-            bt.backgroundColor = UIColorFromRGBA(30, 144, 255, 1.0f);
-            [bt setTitle:self.classArray[i] forState:UIControlStateNormal];
-            [bt addTarget:self action:@selector(Fristcell:) forControlEvents:UIControlEventTouchUpInside];
-            bt.titleLabel.font = [UIFont systemFontOfSize:11];
-            [self.btnArray1 addObject:bt];
+            [bt setButtonImageTitleStyle:ButtonImageTitleStyleRight padding:2];
+
             if (i == 0) {
-                [bt setTitleColor:[UIColor colorWithHexString:@"#292421"] forState:UIControlStateNormal];
+                _oneBtn = bt;
+            }else if(i == 1) {
+                _twoBtn = bt;
+            }else {
+                _threeBtn = bt;
+            }
+        }
+        
+        UILabel *lab = [[UILabel alloc] initWithFrame:CGRectMake(0, 39, kScreenWidth, 1)];
+        lab.backgroundColor= [UIColor colorWithHexString:@"f4f5f6"];
+        [_topBackView addSubview:lab];
+    }
+    return _topBackView;
+}
+- (TopMenuView *)menuView
+{
+    if (!_menuView) {
+        _menuView = [[[NSBundle mainBundle] loadNibNamed:@"TopMenuView" owner:nil options:nil] lastObject];
+        _menuView.frame = CGRectMake(0, kLayoutViewMarginTop+40, WidthFrame, HeightFrame-kLayoutViewMarginTop-40);
+        _menuView.hidden = YES;
+        __weak typeof(self) weakSelf = self;
+        _menuView.selectTypeBlock = ^(NSString *data_name,NSString *data_id,NSString *indexValue,NSInteger index) {
+            weakSelf.menuView.hidden = YES;
+            [weakSelf.selectBtn setTitle:data_name forState:UIControlStateNormal];
+            
+            
+            if ([indexValue isEqualToString:@"1000"]) {
+                weakSelf.Fristparameter = data_id;
+            }else if ([indexValue isEqualToString:@"1001"]) {
+                
+                weakSelf.Secondeparameter = data_id;
+                MicroClassTypeModel *model = weakSelf.tizaiArray[index];
+                
+                for (ChildgradeModel *model2 in model.childgrade) {
+                    [weakSelf.array3 addObject:model2];
+                }
+                
+                ChildgradeModel *model2 = model.childgrade[0];
+                weakSelf.Thridparameter = model2.gid;
+                [weakSelf.threeBtn setTitle:model2.gradename?:@"" forState:UIControlStateNormal];
+            }else {
+                weakSelf.Thridparameter = data_id;
             }
             
-            [cell addSubview:bt];
-            
-        }
-        
-    }else if (indexPath.row ==1){
-        
-        for (int i = 0; i<self.tizaiArray.count; i++) {
-            UIButton *bt = [UIButton buttonWithType:UIButtonTypeCustom];
-            bt.frame = CGRectMake(40+(60+20)*i, 8, 60, 30);
-            bt.tag = 1000+i;
-            MicroClassTypeModel *model = self.tizaiArray[i];
-            
-            bt.layer.cornerRadius = 6;
-            bt.clipsToBounds = YES;
-            bt.backgroundColor = UIColorFromRGBA(30, 144, 255, 1.0f);
-            [bt setTitle:model.tizainame forState:UIControlStateNormal];
-            [bt addTarget:self action:@selector(Secondcell:) forControlEvents:UIControlEventTouchUpInside];
-            if (i == 0) {
-                [bt setTitleColor:[UIColor colorWithHexString:@"#F4A460"] forState:UIControlStateNormal];
-            }
-            bt.titleLabel.font = [UIFont systemFontOfSize:12];
-            
-            [self.btnArray2 addObject:bt];
-            [cell addSubview:bt];
-            
-        }
-        return cell;
-        
-    }else if (indexPath.row ==2){
-        
-
-        for (int i = 0; i<self.array3.count; i++) {
-            self.bt = [UIButton buttonWithType:UIButtonTypeCustom];
-            self.bt.frame = CGRectMake(40+(60+15)*i, 8, 60, 30);
-            self.bt.tag = 1000+i;
-            
-            self.bt.layer.cornerRadius = 6;
-            self.bt.clipsToBounds = YES;
-            MicroClassGradeModel *model = self.array3[i];
-            [self.bt setTitle:model.gradename forState:UIControlStateNormal];
-            [self.bt addTarget:self action:@selector(Thirdcell:) forControlEvents:UIControlEventTouchUpInside];
-            if (i == 0) {
-                [self.bt setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-            }
-            self.bt.backgroundColor = UIColorFromRGBA(30, 144, 255, 1.0f);
-            self.bt.titleLabel.font = [UIFont systemFontOfSize:12];
-            [self.btnArray3 addObject:self.bt];
-            [cell addSubview:self.bt];
-            
-        }
-        
+            _isFresh = NO;
+            _page = 1;
+            [weakSelf GetMicroClass];
+        };
+        [self.view addSubview:_menuView];
     }
-    return cell;
-    
+    return _menuView;
 }
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 50;
-}
--(void)Fristcell :(UIButton *)bt{
-    for (UIButton *btn in self.btnArray1){
-        if (btn.tag == bt.tag) {
-            [btn setTitleColor:[UIColor colorWithHexString:@"#292421"] forState:UIControlStateNormal];
-        }else
+- (void)topMenuClick:(UIButton *)btn
+{
+    if (!self.menuView.isHidden) {
+        self.menuView.hidden = YES;
+        return;
+    }
+    _page = 1;
+    self.menuView.hidden = NO;
+    self.menuView.data_index = [NSString stringWithFormat:@"%ld",(long)btn.tag];
+    switch (btn.tag) {
+        case 1000:
         {
-            [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            self.menuView.dataArr = [NSArray arrayWithArray:self.classArray];
         }
-    }
-
-    NSArray *array = @[@"0",@"1",@"2",@"3"];
-    self.Fristparameter = array[bt.tag-1000];
-    
-    [self GetMicroClass];
-    
-}
--(void)Secondcell :(UIButton*)bt{
-    for (UIButton *btn in self.btnArray2){
-        if (btn.tag == bt.tag) {
-            [btn setTitleColor:[UIColor colorWithHexString:@"#F4A460"] forState:UIControlStateNormal];
-        }else
+            break;
+        case 1001:
         {
-            [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            //            MicroClassTypeModel *model = self.tizaiArray[i];
+            self.menuView.dataArr = [NSArray arrayWithArray:self.tizaiArray];
         }
-    }
-    
-//    [self.tableView reloadData];
-    NSIndexPath *indexPathA = [NSIndexPath indexPathForRow:2 inSection:0]; //单行刷新,刷新第0段第2行
-    
-    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPathA,nil] withRowAnimation:UITableViewRowAnimationNone];
-    
-    MicroClassTypeModel *model = self.tizaiArray[bt.tag-1000];
-    
-    self.Secondeparameter = model.zaitiid;
-    
-    [self.bt removeFromSuperview];
-    
-    self.array3 = self.gradeDic[self.gradeArray[bt.tag-1000]];
-    MicroClassGradeModel *model2 = self.array3[bt.tag - 1000];//默认一开始选中第一个
-    self.Thridparameter = model2.gid;
-    
-    
-    [self GetMicroClass];
-
-    
-}
--(void)Thirdcell :(UIButton *)bt{
-    for (UIButton *btn in self.btnArray3){
-        if (btn.tag == bt.tag) {
-            [btn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-        }else
+            break;
+        case 1002:
         {
-            [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            self.menuView.dataArr = [NSArray arrayWithArray:self.array3];
         }
+            break;
+            
+        default:
+            break;
     }
-    MicroClassGradeModel *model = self.array3[bt.tag - 1000];
-    self.Thridparameter = model.gid;
     
-    [self GetMicroClass];
-    
+    self.selectBtn = btn;
 }
-
 -(UICollectionView *)collectionView{
     if (!_collectionView) {
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
-        _collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, 220, WidthFrame, HeightFrame-220) collectionViewLayout:layout];
-        _collectionView.backgroundColor = UIColorFromRGBA(240, 255, 255, 1.0f);
+        _collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, kLayoutViewMarginTop+40, WidthFrame, HeightFrame-kLayoutViewMarginTop-40) collectionViewLayout:layout];
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
         [_collectionView registerClass:[MicoThridCell class] forCellWithReuseIdentifier:@"MicCell3"];
         _collectionView.backgroundColor = [UIColor whiteColor];
-//        [_collectionView registerClass:[MicoFristCell class] forCellWithReuseIdentifier:@"MicCell1"];
-        
     }
     return _collectionView;
     
@@ -291,91 +253,125 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationItem.title = @"同步课堂";
     self.navigationItem.hidesBackButton =NO;
-
-    [self.view addSubview:self.tableView];
-    
+    [self.view addSubview:self.topBackView];
+    _page = 1;
     self.Fristparameter = @"0";//默认第一行选中
     [self.view addSubview:self.collectionView];
     MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        _page = 1;
         [self GetMicroType];
-        [self GetMicroClass];
         [self.collectionView.mj_header endRefreshing];
     }];
     header.lastUpdatedTimeLabel.hidden = YES;
     header.stateLabel.hidden = YES;
     self.collectionView.mj_header = header;
-    
     [self.collectionView.mj_header beginRefreshing];
+    
+    
     self.collectionView.mj_footer=[MJRefreshBackNormalFooter   footerWithRefreshingBlock:^{
+        _isFresh = YES;
+        _page++;
         
-        
-        //            [self requstMore];
+        [self GetMicroClass];
         [self.collectionView.mj_footer endRefreshing];
     }];
-
+    
 }
 
 -(void)GetMicroType{
     __weak typeof (self) weakSelf = self;
     MicroClassTypeRquset *requst = [[MicroClassTypeRquset alloc]init];
-    
     [requst GetmicrTypeWith:@"2" :^(NSDictionary *json) {
+        NSLog(@"json === %@",json);
         [weakSelf.tizaiArray removeAllObjects];
         [weakSelf.gradeArray removeAllObjects];
-        [weakSelf.array3 removeAllObjects];
-        for (NSDictionary *dic in json[@"ret_data"]) {
-            MicroClassTypeModel *model = [MicroClassTypeModel loadWithJSOn:dic];
-            [weakSelf.tizaiArray addObject:model];
-            
-            [weakSelf.gradeArray addObject:model.tizainame];
-            
-            weakSelf.array3 = weakSelf.gradeDic[weakSelf.gradeArray[0]];//默认第3行一开始选中；
-            NSMutableArray *array = [NSMutableArray array];
-            for (NSDictionary *dic2 in model.childgrade) {
-                MicroClassGradeModel *model2 = [MicroClassGradeModel loadWithJSOn:dic2];
-
-                [array addObject:model2];
-            }
-            [weakSelf.gradeDic setValue:array forKey:dic[@"tizainame"]];
+        NSArray *arr = @[@{@"gid":@"",@"gradename":@"所有年级"}];
+        NSDictionary *myDic = @{@"tizainame":@"所有分类",@"zaitiid":@"",@"childgrade":arr};
+        
+        NSMutableArray *mutableArr = [NSMutableArray arrayWithArray:json[@"ret_data"]];
+        [mutableArr addObject:myDic];
+        
+        for (NSDictionary *dic in mutableArr) {
+            MicroClassTypeModel *model = [MicroClassTypeModel mj_objectWithKeyValues:dic];
+            [weakSelf.tizaiArray addObject:model];            
         }
-//        NSLog(@"%@",json);
+        
         MicroClassTypeModel *moren = weakSelf.tizaiArray[0];
         weakSelf.Secondeparameter = moren.zaitiid;//默认第2行一开始选中
-//        NSLog(@"------%lu",(unsigned long)self.tizaiArray.count);
-//        NSLog(@"------%lu",[self.gradeDic[self.gradeArray[1]] count]);
-//        NSLog(@"------%lu",[self.gradeDic[self.gradeArray[2]] count]);
-//        NSLog(@"------%lu",[self.gradeDic[self.gradeArray[3]] count]);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.tableView reloadData];
-        });
+        NSMutableArray *array = [NSMutableArray array];
+        for (NSDictionary *dic2 in moren.childgrade) {
+            ChildgradeModel *model2 = [ChildgradeModel mj_objectWithKeyValues:dic2];
+            [array addObject:model2];
+        }
+        [weakSelf.array3 addObjectsFromArray:array];
+        
+        [self GetMicroClass];
     }];
-
+    
 }
 -(void)GetMicroClass{
-    __weak typeof (self) weakSelf = self;
-    NSLog(@"33333  1:%@",self.Fristparameter);
-    NSLog(@"33333  2:%@",self.Secondeparameter);
-    NSLog(@"33333  3:%@",self.Thridparameter);
-    MicroClassLists *requst = [[MicroClassLists alloc]init];
-    [requst GetmicrListWith:self.Fristparameter :self.Secondeparameter :self.Thridparameter :^(NSDictionary *json) {
-//        NSLog(@"====%@",json);
-        [weakSelf.allMicArray removeAllObjects];
-        for (NSDictionary *dic in json[@"ret_data"][@"pageInfo"]) {
-            WriteListModel *model = [WriteListModel loadWithJSOn:dic];
-            [weakSelf.allMicArray addObject:model];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    BaseRequest *request = [BaseRequest requestWithURL:nil];
+    NSDictionary *dic = @{
+                          @"Action":@"GetMicroClassList",
+                          @"Token":@"0A66A4FD-146F-4542-8D7B-33CDEC2981F9",
+                          @"changeId":self.Fristparameter,
+                          @"masterId":self.Secondeparameter,
+                          @"subjectId":self.Thridparameter,
+                          @"PageIndex":@(_page),
+                          @"PageSize":@"20",
+                          @"prostatic":@"-1",
+                          @"recommed":@"-1",
+                          @"timeSpan":@"0"
+                          };
+    
+    NSLog(@"dic === %@",dic);
+    [request startWithMethod:HTTPTypePOST params:dic successedBlock:^(id succeedResult) {
+        NSLog(@"ForecastUrl === %@",succeedResult);
+        [self.collectionView.mj_footer endRefreshing];
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+        NSArray *arr = succeedResult[@"ret_data"][@"pageInfo"];
+        if (_isFresh) {
+            if (arr&&arr.count>0) {
+                for (NSDictionary *dic in arr) {
+                    WriteListModel *model = [WriteListModel loadWithJSOn:dic];
+                    [self.allMicArray addObject:model];
+                }
+            }else {
+                NSLog(@"没有更多了");
+                [Global promptMessage:@"没有更多了" inView:self.view];
+            }
+        }else {
+            [self.allMicArray removeAllObjects];
+            
+            if (arr&&arr.count>0) {
+                for (NSDictionary *dic in arr) {
+                    WriteListModel *model = [WriteListModel loadWithJSOn:dic];
+                    [self.allMicArray addObject:model];
+                }
+            }else {
+                NSLog(@"没有更多了");
+                [Global promptMessage:@"暂无数据" inView:self.view];
+            }
         }
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.collectionView reloadData];
+            [self.collectionView reloadData];
         });
- 
+        
+    } failedBolck:^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"error===%@",error.localizedDescription);
+        [self.collectionView.mj_footer endRefreshing];
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
     }];
-
+    
+    
+    
 }
 #pragma mark 定义展示的UICollectionViewCell的个数
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    
     return self.allMicArray.count;
 }
 
@@ -390,14 +386,13 @@
     MicoThridCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MicCell3" forIndexPath:indexPath];
     WriteListModel *model  = self.allMicArray[indexPath.row];
     NSString *str = [NSString stringWithFormat:@"%@%@",HTurl,model.MicroclassInfoAttr1];
-//    [cell.imageView sd_setImageWithURL:[NSURL URLWithString:str]];
     [cell.imageView sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"Mic01"] options:SDWebImageRefreshCached];
     cell.titleLabel.text = model.MicroclassInfoTitle;
     
     return cell;
 }
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-
+    
     return CGSizeMake(WidthFrame/3-30,HeightFrame/8+20);
 }
 // 设置整个组的缩进量是多少
@@ -417,15 +412,19 @@
     NSLog(@"选择%ld",indexPath.item);
 }
 -(void)leftBarButton{
-    UIBarButtonItem *item=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"left-arrow_s"] style: UIBarButtonItemStylePlain target:self action:@selector(onBack)];
-    
-    self.navigationItem.leftBarButtonItem=item;
-    
+//    UIButton *bt = [UIButton buttonWithType:UIButtonTypeCustom];
+//    bt.frame = CGRectMake(0, 0, 20, 20);
+//    [bt setBackgroundImage:[UIImage imageNamed:@"ty_jianTouLeft"] forState:UIControlStateNormal];
+//    [bt addTarget:self action:@selector(onBack) forControlEvents:UIControlEventTouchUpInside];
+//
+////    UIBarButtonItem *item=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"ty_jianTouLeft"] style: UIBarButtonItemStylePlain target:self action:@selector(onBack)];
+//    UIBarButtonItem *item= [[UIBarButtonItem alloc] initWithCustomView:bt];
+//    self.navigationItem.leftBarButtonItem=item;
+
+    GO_BACK;
 }
--(void)onBack{
+-(void)goBackNV{
     [self.navigationController popViewControllerAnimated:YES];
-    
-    
 }
 
 @end

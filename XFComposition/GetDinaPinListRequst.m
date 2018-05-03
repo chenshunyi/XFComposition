@@ -20,6 +20,7 @@
                                  @"classId":classId,
                                  @"modelId":modelId,
                                  @"keyWord":keyWord};
+    NSLog(@"%@",parameters);
     [requst requestWithURLString:APIurl parameters:parameters type:NetworkRequestTypePost imgData:nil resultBlock:^(id responseObject, NSError *error, NSURLSessionDataTask *task) {
         
         block(responseObject);

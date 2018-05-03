@@ -99,9 +99,9 @@
 + (BOOL)isLogin {
     XFUserInfo *aModel = [self getUserInfo];
     if (aModel.Loginid) {
-        return NO;
+        return YES;
     }
-    return YES;
+    return NO;
 }
 
 

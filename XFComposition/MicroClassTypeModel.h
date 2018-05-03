@@ -13,9 +13,11 @@
 @property (nonatomic,strong)NSString *tizainame;
 @property (nonatomic,strong)NSString *zaitiid;
 
+@end
 
 
+@interface ChildgradeModel : NSObject
+@property (nonatomic,strong)NSString *gradename;
+@property (nonatomic,strong)NSString *gid;
 
-
-+(id)loadWithJSOn:(NSDictionary *)json;
 @end

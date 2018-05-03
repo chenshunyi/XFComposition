@@ -30,12 +30,12 @@
 @implementation BookwritingController
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:YES];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+//    [self.navigationController setNavigationBarHidden:NO animated:YES];
     [self leftBarButton];
 }
 -(void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:YES];
-    [self.navigationController setNavigationBarHidden:YES animated:YES];
+//    [self.navigationController setNavigationBarHidden:YES animated:YES];
     
 }
 
@@ -207,18 +207,11 @@
                     
                     AddBlogPicReuqst *requst2 = [[AddBlogPicReuqst alloc]init];
                     [requst2 AddBlogPicReuqstwithblogID:weakSelf.writStr withblogPic:arr[i] withuserid:self.xf.Loginid :^(NSDictionary *json) {
-                        
                         self.isTF = json[@"ret_code"];
-                        //                    static dispatch_once_t onceToken;
-                        //                    dispatch_once(&onceToken, ^{
-                        //                        NSLog(@"是否成功%@",self.isTF) ;
-                        //                    });
                     }];
-                    
                 }
-                
             }
-            [self onBack];
+            [self.navigationController popToRootViewControllerAnimated:YES];
             
         }else{
             [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"%@",json[@"ret_msg"]]];

@@ -32,3 +32,9 @@
 }
 
 @end
+
+
+
+@implementation VolunteerNewsListModel
+
+@end

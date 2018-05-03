@@ -15,11 +15,6 @@
 -(instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = [UIColor whiteColor];
-//        CGFloat backW = WidthFrame/2-5;
-//        CGFloat backH =HeightFrame/8;
-        
-        self.layer.borderWidth = 0.5;
-        self.layer.borderColor = [[UIColor lightGrayColor] CGColor];
         
         self.imageView  = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, HeightFrame/8-20, HeightFrame/8-20)];
         
@@ -44,7 +39,6 @@
         
         self.rightLabel.sd_layout.leftSpaceToView(self.titleLabel, 0).topEqualToView(self.titleLabel).heightIs(h);
         [self.rightLabel setSingleLineAutoResizeWithMaxWidth:0];
-//        self.rightLabel.text = @"》";
         
         [self.rightLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:9]];
         self.rightLabel.textAlignment = NSTextAlignmentCenter;

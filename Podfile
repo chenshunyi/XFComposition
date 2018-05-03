@@ -16,7 +16,7 @@ use_frameworks!
 
 
 pod 'Masonry'
-
+pod 'CWLateralSlide'
 
 
 end

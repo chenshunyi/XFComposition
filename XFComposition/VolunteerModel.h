@@ -24,3 +24,13 @@
 +(id)loadWithJSOn:(NSDictionary *)json;
 
 @end
+
+@interface VolunteerNewsListModel : NSObject
+
+@property (nonatomic,strong)NSString *ID;
+@property (nonatomic,strong)NSString *AddTime;
+@property (nonatomic,strong)NSString *Click;
+@property (nonatomic,strong)NSString *NewContent;
+@property (nonatomic,strong)NSString *PicURL;
+@property (nonatomic,strong)NSString *NewsTitle;
+@end

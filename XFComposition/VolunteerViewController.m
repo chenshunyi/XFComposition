@@ -32,9 +32,15 @@
 #import "BookwritingController.h"
 #import "ApplyActiveViewController.h"
 #import "MicrodetailController.h"
+
+#import "TYVolunteerCollectionViewCell.h"
+#import "VolunteerWebViewController.h"
+#import "TYAllListViewController.h"
+
 @interface VolunteerViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,VolunterrApplyteacherDelegate,VolunteerDelegate,VolunteerFootDelegate>
 @property (nonatomic,strong)UICollectionView *collectionView;
 @property (nonatomic,strong)NSMutableArray *activityArray;//活动数据
+@property (nonatomic,strong)NSMutableArray *newsArr;
 @property (nonatomic,strong)NSMutableArray *microArray;
 @property (nonatomic,strong)NSMutableArray *teacherArray;
 
@@ -53,10 +59,10 @@
         _collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, 0, WidthFrame, HeightFrame) collectionViewLayout:flowLayout];
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
-        _collectionView.backgroundColor = UIColorFromRGBA(240, 255, 255, 1.0f);
+        _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.showsVerticalScrollIndicator =NO;
         [_collectionView registerClass:[VolunteerFristCell class] forCellWithReuseIdentifier:@"FristCell"];
-        [_collectionView registerClass:[VolunteerActiviCell class] forCellWithReuseIdentifier:@"SecondCell"];
+        [_collectionView registerClass:[TYVolunteerCollectionViewCell class] forCellWithReuseIdentifier:@"SecondCell"];
         [_collectionView registerClass:[VolunteerThridCell class] forCellWithReuseIdentifier:@"ThridCell"];
 
         [_collectionView registerClass:[MicoFourCell class] forCellWithReuseIdentifier:@"MicCell4"];
@@ -110,14 +116,15 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"志愿者活动";
+    _newsArr = [[NSMutableArray alloc] initWithCapacity:0];
     [self.view addSubview:self.collectionView];
     self.activityStr = @"当前活动";
     self.typestr = @"2";
     MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        
         [self GetReadAcitive:self.typestr];
         [self GetMicro];
         [self GetTeacher];
+        [self getNewsListRequestData];
         [self.collectionView.mj_header endRefreshing];
     }];
     header.lastUpdatedTimeLabel.hidden = YES;
@@ -125,10 +132,6 @@
     self.collectionView.mj_header = header;
 
     [self.collectionView.mj_header beginRefreshing];
-//    self.activityStr = @"当前活动";
-//    [self GetReadAcitive:@"2"];
-//    [self GetMicro];
-//    [self GetTeacher];
     
 }
 
@@ -137,26 +140,6 @@
 #pragma mark 定义展示的UICollectionViewCell的个数
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-//    if (self.activityArray.count==0) {
-//        return 1;
-//    }
-//    if (section == 0) {
-//        return 1;
-//    }else if (section == 1){
-//        if (self.activityArray.count==0) {
-//            return 1;
-//        }
-//        return 2;
-//    }else if (section == 2){
-//        if (self.microArray.count==0) {
-//            return 1;
-//        }
-//        return self.microArray.count;
-//    }else if (section == 3){
-//        return self.teacherArray.count;
-//    }
-//    return 0;
-    
     if (self.activityArray.count==0) {
         return 1;
     }
@@ -166,7 +149,7 @@
         if (self.activityArray.count==0) {
             return 1;
         }
-        return 2;
+        return 1;
     }else if (section == 2){
         return self.teacherArray.count;
     }else if (section == 3){
@@ -178,11 +161,6 @@
 #pragma mark 定义展示的Section的个数
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-//    if (self.activityArray.count==0) {
-//        return 1;
-//    }
-//    return 4;
-//
     if (self.activityArray.count==0) {
         return 1;
     }
@@ -204,83 +182,27 @@
             return cell;
             
         }
-        VolunteerActiviCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"SecondCell" forIndexPath:indexPath];
+        TYVolunteerCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"SecondCell" forIndexPath:indexPath];
         cell.delegate = self;
-        VolunteerModel *model;
-        if (self.activityArray.count > indexPath.row) {
-            model = self.activityArray[indexPath.row];
-        }
-//        VolunteerModel *model = self.activityArray[indexPath.row];
-        NSString *str = [NSString stringWithFormat:@"%@%@",HTurl,model.activepic];
-
-        cell.timeLabel.text = [NSString stringWithFormat:@"活动时间: %@~%@",[model.activestarttime substringToIndex:10],[model.activeendtime substringToIndex:10]];
-        [cell.imgView sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"icon_02"] options:SDWebImageRefreshCached];
-//        [cell.imgView sd_setImageWithURL:[NSURL URLWithString:str]];
-        
-        NSDateFormatter *formatter=[[NSDateFormatter alloc]init];
-        [formatter setDateFormat:@"YYYY/MM/dd HH:mm:ss"];
-        NSString *dateTime=[formatter stringFromDate:[NSDate date]];
-        NSDate *date = [formatter dateFromString:dateTime];
-       
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"YYYY/MM/dd HH:mm:ss"];
-        
-        NSDate *date2 = [dateFormatter dateFromString:model.activeendtime];
-        //----------将nsdate按formatter格式转成nsstring
-        
-        
-
-        
-        if ([model.activetype isEqualToString:@"2"]) {
-            cell.tougaobt.hidden = YES;
-            cell.teacherbt.hidden = NO;
-            cell.workbt.hidden = NO;
-            if ([self compareOneDay:date withAnotherDay:date2] == 1 ) {
-                cell.workbt.backgroundColor = [UIColor lightGrayColor];
-                [cell.workbt setTitle:@"已经结束" forState:UIControlStateNormal];
-                [cell.workbt setEnabled:NO];
-            }else{
-                cell.workbt.backgroundColor = [UIColor colorWithHexString:@"2791cf"];
-                [cell.workbt setTitle:@"申请工作" forState:UIControlStateNormal];
-                [cell.workbt setEnabled:YES];
-                
+        cell.activeArr = self.activityArray;
+        cell.newsArr = self.newsArr;
+         __weak typeof(self) weakSelf = self;
+        cell.moreMessageBlock = ^(NSInteger tag) {
+            [weakSelf gotomoreActivity:tag];
+        };
+        cell.tableSelectBlock = ^(id model) {
+            if ([model isKindOfClass:[VolunteerModel class]]) {
+                VolunteerModel *volunteerModel = model;
+                RecruiteacherController *vc = [[RecruiteacherController alloc]init];
+                vc.RecruitActiveID = volunteerModel.activeid;
+                [self.navigationController pushViewController:vc animated:YES];
+            }else {
+                VolunteerNewsListModel *newsModel = model;
+                VolunteerWebViewController *vc = [[VolunteerWebViewController alloc] init];
+                vc.urlStr = [self htmlEntityDecode:newsModel.NewContent?:@""];
+                [self.navigationController pushViewController:vc animated:YES];
             }
-        }else {
-            cell.tougaobt.hidden = NO;
-            cell.teacherbt.hidden = YES;
-            cell.workbt.hidden = YES;
-            
-            //            NSLog(@"sj1 ---%@,sj2----%@",date,date2);
-            if ([self compareOneDay:date withAnotherDay:date2] == 1 ) {
-                cell.tougaobt.backgroundColor = [UIColor lightGrayColor];
-                [cell.tougaobt setTitle:@"已经结束" forState:UIControlStateNormal];
-                [cell.tougaobt setEnabled:NO];
-            }else{
-                cell.tougaobt.backgroundColor = [UIColor colorWithHexString:@"3691CE"];
-                [cell.tougaobt setTitle:@"开始投稿" forState:UIControlStateNormal];
-                [cell.tougaobt setEnabled:YES];
-            }
-            
-        }
-        
-        
-        cell.detailBt.tag = 1000+indexPath.row;
-        cell.workbt.tag = 2000+indexPath.row;
-        cell.titleLabel.text = model.activename;
-        cell.textView.attributedText = nil;
-//        NSString * str1 = [model.activeinfo stringByRemovingPercentEncoding];
-        
-        //1.将字符串转化为标准HTML字符串
-//        str1 = [self htmlEntityDecode:str1];
-//        //2.将HTML字符串转换为attributeString
-//        NSAttributedString * attributeStr = [self attributedStringWithHTMLString:str1];
-        
-        //3.使用label加载html字符串
-//        cell.textView.attributedText = attributeStr;
-        
-        cell.textView.text = [self htmlEntityDecode:[model.activeinfo stringByRemovingPercentEncoding]];
-        
-        
+        };
         return cell;
     }else if (indexPath.section == 3){
         if (self.microArray.count == 0) {
@@ -337,7 +259,7 @@
         if (self.activityArray.count == 0) {
             return CGSizeMake(WidthFrame,40);
         }
-        return CGSizeMake(WidthFrame, 130);
+        return CGSizeMake(WidthFrame, 300);
         
     }else if (indexPath.section == 3){
         if (self.microArray.count == 0) {
@@ -345,11 +267,10 @@
         }
         return CGSizeMake((WidthFrame-20-20)/3, 80);//在这里能救第2行
     }
-        return CGSizeMake((WidthFrame-10-40)/3, 110);
+    return CGSizeMake((WidthFrame-20-20)/2, 90);
 }
 // 设置整个组的缩进量是多少
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    //    return UIEdgeInsetsMake(<#CGFloat top#>, <#CGFloat left#>, <#CGFloat bottom#>, <#CGFloat right#>)
     if (section == 0) {
         return UIEdgeInsetsMake(2, 0, 2, 0);
     }else if (section == 1){
@@ -365,36 +286,21 @@
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     return 5;
 }
-// 设置section头视图的参考大小，与tableheaderview类似
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout
 referenceSizeForHeaderInSection:(NSInteger)section {
-   
-    if (section == 0) {
-        return CGSizeZero;
-    }
+    
+    if (section == 2||section == 3) {
         return CGSizeMake(WidthFrame, 40);
+    }
+    return CGSizeZero;
     
 }
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout
-referenceSizeForFooterInSection:(NSInteger)section {
-    if (section == 1) {
-        return CGSizeMake(WidthFrame, 30);
-    }else
-        return CGSizeZero;
-    
-}
-
 #pragma mark 头部显示的内容
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
     
     if (kind == UICollectionElementKindSectionHeader){
-        if (indexPath.section == 1){
-            VolunteerFrsitHeadView *headView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"header1" forIndexPath:indexPath];
-            headView.delegate = self;
-            self.btnArray=headView.tabBtnArray;
-            return headView;
-        }if (indexPath.section == 3){
+        if (indexPath.section == 3){
             SecondHeadView *headView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"header2" forIndexPath:indexPath];
             headView.moreBt.hidden = YES;
             [headView.Titlebt setTitle:@"微课堂" forState:UIControlStateNormal];
@@ -411,22 +317,10 @@ referenceSizeForFooterInSection:(NSInteger)section {
             [button addTarget:self action:@selector(gototeacher) forControlEvents:UIControlEventTouchUpInside];
             return headView;
         }
-        
-    
-    
-    }else if (kind == UICollectionElementKindSectionFooter){
-        if (indexPath.section == 1) {
-            VolunterrFristFootView *footView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"foot1" forIndexPath:indexPath];
-            footView.delegate = self;
-            return footView;
-        }
-        return nil;
-    
     }
     return nil;
     
 }
-
 
 -(void)GetReadAcitive :(NSString *)type{
     __weak typeof (self) weakSelf = self;
@@ -440,13 +334,39 @@ referenceSizeForFooterInSection:(NSInteger)section {
             [weakSelf.activityArray addObject:model];
             
         }
-
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf.collectionView reloadData];
         });
 
     }];
 
+}
+- (void)getNewsListRequestData
+{
+    
+    BaseRequest *request = [BaseRequest requestWithURL:nil];
+    NSDictionary *dic = @{
+                          @"Action":@"GetNewsList",
+                          @"Token":@"0A66A4FD-146F-4542-8D7B-33CDEC2981F9",
+                          @"PageIndex":@"1",
+                          @"PageSize":@"3"
+                          };
+    
+    [request startWithMethod:HTTPTypePOST params:dic successedBlock:^(id succeedResult) {
+        [self.newsArr removeAllObjects];
+        NSLog(@"ForecastUrl === %@",succeedResult);
+        NSArray *arr = succeedResult[@"ret_data"][@"pageInfo"];
+        for (NSDictionary *dic in arr) {
+            VolunteerNewsListModel *model = [VolunteerNewsListModel mj_objectWithKeyValues:dic];
+            [self.newsArr addObject:model];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.collectionView reloadData];
+        });
+    } failedBolck:^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"error===%@",error.localizedDescription);
+    }];
+    
 }
 //微课堂
 -(void)GetMicro{
@@ -489,11 +409,17 @@ referenceSizeForFooterInSection:(NSInteger)section {
 
 
 //更多活动按钮
--(void)gotomoreActivity{
+-(void)gotomoreActivity:(NSInteger )intex{
     
-    ActivityController *vc = [[ActivityController alloc]init];
-    vc.titleStr = self.activityStr;
+    TYAllListViewController *vc = [[TYAllListViewController alloc]init];
+    if (intex == 10) {
+        vc.cellString = @"VolunteerActiveiTableViewCell";
+    }else {
+        vc.cellString = @"VolunteerNewsTableViewCell";
+    }
     [self.navigationController pushViewController:vc animated:YES];
+    
+    
 }
 //头部按钮
 -(void)VolunteerSrollView :(UIButton *)btn{
@@ -507,20 +433,14 @@ referenceSizeForFooterInSection:(NSInteger)section {
     }
     
     if (btn.tag == 1000) {
-        self.activityStr = @"当前活动";
-        self.typestr = @"2";
-        [self GetReadAcitive:@"2"];
-        
-        
-    }else if (btn.tag == 1001) {
         self.activityStr = @"志愿教师招募";
         self.typestr = @"2";
         [self GetReadAcitive:@"2"];
         
-    }else if (btn.tag == 1002) {
-        self.activityStr = @"学生投稿活动";
+    }else if (btn.tag == 1001) {
+        self.activityStr = @"新闻公告";
         self.typestr = @"0";
-        [self GetReadAcitive:@"0"];
+        [self getNewsListRequestData];
         
     }
     
@@ -561,21 +481,6 @@ referenceSizeForFooterInSection:(NSInteger)section {
     
     ApplyViewController *vc = [[ApplyViewController alloc]init];
     [self.navigationController pushViewController:vc animated:YES];
-//    __weak typeof (self) weakSelf = self;
-//    IsVoleTeacherRequst *requst = [[IsVoleTeacherRequst alloc]init];
-//    [requst IsVoleTeacherRequstWithuserid:self.xf.Loginid :^(NSDictionary *json) {
-//        if ([json[@"ret_data"] integerValue] == 1) {
-//            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"您已经是志愿者老师！" message:nil preferredStyle:UIAlertControllerStyleAlert];
-//            
-//            [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-//                
-//            }]];
-//            [weakSelf presentViewController:alert animated:YES completion:nil];
-//        }else{
-//            ApplyViewController *vc = [[ApplyViewController alloc]init];
-//            [weakSelf.navigationController pushViewController:vc animated:YES];
-//        }
-//    }];
     
     
 }

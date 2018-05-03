@@ -86,8 +86,10 @@
         [self requstMore:type];
         [self.collectionView.mj_footer endRefreshing];
     }];
-    
-
+    GO_BACK;
+}
+-(void)goBackNV {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 -(void)GetActivityList :(NSString*)type{

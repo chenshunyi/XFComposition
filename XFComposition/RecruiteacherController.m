@@ -51,6 +51,10 @@
     self.collectionView.mj_header = header;
 
     [self.collectionView.mj_header beginRefreshing];
+    GO_BACK;
+}
+-(void)goBackNV {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 -(void)detaiRequst{
     

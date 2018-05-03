@@ -27,7 +27,31 @@
 #import "WritingxzViewController.h"
 
 #import "MicrodetailController.h"
-@interface MicroClassViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,MircFiveCellDelegate>
+
+@interface SecondFooterView : UICollectionReusableView
+
+@end
+@implementation SecondFooterView
+#pragma mark - 初始化
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self setUI];
+    }
+    return self;
+}
+- (void)setUI {
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 10)];
+    view.backgroundColor = [UIColor colorWithHexString:@"e9f4fc"];
+    [self addSubview:view];
+}
+@end
+
+@interface MicroClassViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,MircFiveCellDelegate,UIScrollViewDelegate> {
+    UIImageView *barImageView;
+    UIView *alpha_view;
+}
 @property (nonatomic,strong)UICollectionView *collectionView;
 @property (nonatomic,strong)NSMutableArray *startArray;
 @property (nonatomic,strong)NSMutableArray *jxArray;
@@ -40,6 +64,31 @@
 @end
 
 @implementation MicroClassViewController
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    
+    return UIStatusBarStyleLightContent;
+    
+}
+#pragma mark - UINavigationControllerDelegate
+// 将要显示控制器
+
+- (void)setStatusBarBackgroundColor:(UIColor *)color {
+    
+    UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
+    if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
+        statusBar.backgroundColor = color;
+    }
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self setStatusBarBackgroundColor:navigation_barColor(1)];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self setStatusBarBackgroundColor:nil];
+    [self.navigationController setNavigationBarHidden:NO animated:NO];
+}
 -(UICollectionView *)collectionView{
     if (!_collectionView) {
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
@@ -48,13 +97,11 @@
         _collectionView.dataSource = self;
         _collectionView.backgroundColor = [UIColor whiteColor];
         [_collectionView registerClass:[MicoFristCell class] forCellWithReuseIdentifier:@"MicCell1"];
-//        [_collectionView registerClass:[MicoSecondCell class] forCellWithReuseIdentifier:@"MicCell2"];
         [_collectionView registerClass:[MicoThridCell class] forCellWithReuseIdentifier:@"MicCell3"];
         [_collectionView registerClass:[MicoFourCell class] forCellWithReuseIdentifier:@"MicCell4"];
         [_collectionView registerClass:[MircFiveCell class] forCellWithReuseIdentifier:@"MicCell5"];
         [_collectionView registerClass:[MicReplaceCell class] forCellWithReuseIdentifier:@"MicReplaceCell"];
         _collectionView.showsVerticalScrollIndicator =NO;
-//        [_collectionView registerClass:[MicHeadView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header1"];
         [_collectionView registerClass:[SecondHeadView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header2"];
     }
     return _collectionView;
@@ -112,14 +159,49 @@
     
     [self.collectionView.mj_header beginRefreshing];
 
+    [self myNavigationBarView];
+}
+- (void)myNavigationBarView {
+    UIView *nav_view = [[UIView alloc] initWithFrame:CGRectMake(0, kStatusBarHeight, kScreenWidth, kNavigationBarHeight)];
+    nav_view.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:nav_view];
+    
+    alpha_view =[[UIView alloc] initWithFrame:CGRectMake(0, 0, nav_view.width, nav_view.height)];
+    alpha_view.alpha = 0;
+    alpha_view.backgroundColor = navigation_barColor(1);
+    [nav_view addSubview:alpha_view];
+    
+    UILabel *titleLab = [[UILabel alloc] init];
+    titleLab.textColor = [UIColor whiteColor];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    titleLab.text = @"微课堂";
+    [nav_view addSubview:titleLab];
+    [titleLab mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.mas_equalTo(nav_view.mas_centerX);
+        make.centerY.mas_equalTo(nav_view.mas_centerY);
+    }];
+    UIButton *bt = [UIButton buttonWithType:UIButtonTypeCustom];
+    bt.frame = CGRectMake(11, (kNavigationBarHeight-20)/2.f, 20, 20);
+    bt.backgroundColor = [UIColor clearColor];
+    [bt setBackgroundImage:[UIImage imageNamed:@"ty_jianTouLeft"] forState:UIControlStateNormal];
+    [bt addTarget:self action:@selector(goBacka) forControlEvents:UIControlEventTouchUpInside];
+    [nav_view addSubview:bt];
     
 }
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    CGFloat minAlphaOffset = - kLayoutViewMarginTop;
+    CGFloat maxAlphaOffset = WidthFrame*200/375.f;
+    CGFloat offset = scrollView.contentOffset.y;
+    CGFloat alpha = (offset - minAlphaOffset) / (maxAlphaOffset - minAlphaOffset);
 
+    if (offset == -kStatusBarHeight) {
+        alpha = 0;
+    }
+    alpha_view.alpha = alpha;
+}
 -(void)goBacka{
     
     [self.navigationController popViewControllerAnimated:YES];
-//    [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
 }
 //微课
 -(void)MicClassRequstList :(NSString *)timespan{
@@ -284,9 +366,8 @@
         cell.nameLabel.text = model.teacherName;
         cell.jsLabel.text = [NSString stringWithFormat:@"%@  高级教师",model.teacherschool];;
         cell.gyLabel.text = [NSString stringWithFormat:@"公益值:%@",model.teacherGyNum];
-        
+        cell.djLabel.text = [NSString stringWithFormat:@"暂无星级"];
         cell.a = [model.teacherStartNum intValue];
-
         
         return cell;
     }else if (indexPath.section == 5){
@@ -304,7 +385,7 @@
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.section == 0) {
         
-        return CGSizeMake(WidthFrame, HeightFrame/3);
+        return CGSizeMake(WidthFrame, WidthFrame*200/375.f);
         
     }
     else if (indexPath.section == 1){
@@ -330,7 +411,7 @@
     
     else if (indexPath.section == 4){
         
-        return CGSizeMake((WidthFrame-20-30)/3, 110);
+        return CGSizeMake((WidthFrame-20-20)/2, 90);
     }else if (indexPath.section == 5){
         return CGSizeMake(WidthFrame-30, 80);
     }
@@ -353,7 +434,6 @@ referenceSizeForHeaderInSection:(NSInteger)section {
     
     
     if (kind == UICollectionElementKindSectionHeader){
-//            if (indexPath.section == 1 ||indexPath.section == 2 || indexPath.section == 3 ) {
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         
@@ -385,12 +465,12 @@ referenceSizeForHeaderInSection:(NSInteger)section {
             button.tag = 2005;
         }
         [button addTarget:self action:@selector(doMore :) forControlEvents:UIControlEventTouchUpInside];
-        //                view.delegate = self;
-        
         
         return view;
         
-        //        }
+    } else {
+        SecondFooterView *footerView = [[SecondFooterView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 10)];
+        return footerView;
     }
     return nil;
     
@@ -404,7 +484,6 @@ referenceSizeForHeaderInSection:(NSInteger)section {
 }
 // 设置整个组的缩进量是多少
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    //    return UIEdgeInsetsMake(<#CGFloat top#>, <#CGFloat left#>, <#CGFloat bottom#>, <#CGFloat right#>)
     if (section == 1 || section == 2 || section ==3) {
         return UIEdgeInsetsMake(2, 20, 2, 20);
     }else if (section == 4){
@@ -417,15 +496,6 @@ referenceSizeForHeaderInSection:(NSInteger)section {
         return UIEdgeInsetsZero;
     
 }
-
-////横向
-//- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section{
-//    return 1;
-//}
-//// 竖向   设置最小行间距，也就是前一行与后一行的中间最小间隔  行间距
-//- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-//    return 5;
-//}
 #pragma mark UICollectionView被选中时调用的方法
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -453,15 +523,11 @@ referenceSizeForHeaderInSection:(NSInteger)section {
     
     
 }
-- (void)viewWillDisappear:(BOOL)animated {
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
-    [super viewWillDisappear:animated];
-}
+
 
 -(void)gotoMircFiveCell :(NSIndexPath *)index
 {
     WritingxzViewController *vc = [[WritingxzViewController alloc]init];
-    //        vc.model = self.compositionArray[indexPath.row];
     DianPingModel *model = self.dianpingArray[index.row];
     vc.workId = model.DPid;
     [self.navigationController pushViewController:vc animated:YES];

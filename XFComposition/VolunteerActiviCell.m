@@ -34,17 +34,17 @@
         self.detailBt = [UIButton buttonWithType:UIButtonTypeCustom];
         
         
-        self.detailBt.frame = CGRectMake(WidthFrame-90, 0, 80, 20);
-        [self.detailBt setTitle:@"查看活动详情" forState:UIControlStateNormal];
-        [self.detailBt addTarget:self action:@selector(lookDetail:) forControlEvents:UIControlEventTouchUpInside];
-        self.detailBt.layer.masksToBounds = YES;
-        self.detailBt.layer.cornerRadius = 6;
-        self.detailBt.layer.borderWidth = 1;
-        self.detailBt.layer.borderColor = [[UIColor colorWithHexString:@"e18f17"]CGColor];
-        [self.detailBt setTitleColor:[UIColor colorWithHexString:@"e18f17"] forState:UIControlStateNormal];
-        self.detailBt.titleLabel.font = [UIFont systemFontOfSize:10];
-        [self addSubview:self.detailBt];
-        
+//        self.detailBt.frame = CGRectMake(WidthFrame-90, 0, 80, 20);
+//        [self.detailBt setTitle:@"查看活动详情" forState:UIControlStateNormal];
+//        [self.detailBt addTarget:self action:@selector(lookDetail:) forControlEvents:UIControlEventTouchUpInside];
+//        self.detailBt.layer.masksToBounds = YES;
+//        self.detailBt.layer.cornerRadius = 6;
+//        self.detailBt.layer.borderWidth = 1;
+//        self.detailBt.layer.borderColor = [[UIColor colorWithHexString:@"e18f17"]CGColor];
+//        [self.detailBt setTitleColor:[UIColor colorWithHexString:@"e18f17"] forState:UIControlStateNormal];
+//        self.detailBt.titleLabel.font = [UIFont systemFontOfSize:10];
+//        [self addSubview:self.detailBt];
+//
         self.timeLabel.sd_layout.leftSpaceToView(self.imgView, 5).topSpaceToView(self.titleLabel, 5).heightIs(20);
         [self.timeLabel setSingleLineAutoResizeWithMaxWidth:0];
         
@@ -62,67 +62,67 @@
         self.textView.editable = NO;
         self.textView.text = @"wowowowocccc我";
         
-        self.teacherbt = [UIButton buttonWithType:UIButtonTypeSystem];
-        self.teacherbt.frame = CGRectMake(40, 100, WidthFrame/2-50, 25);
-        [self.teacherbt setTitle:@"申请成为志愿者老师" forState:UIControlStateNormal];
-        [self.teacherbt addTarget:self action:@selector(ApplyTeacher) forControlEvents:UIControlEventTouchUpInside];
-        self.teacherbt.backgroundColor = [UIColor colorWithHexString:@"389e98"];
-        self.teacherbt.layer.masksToBounds = YES;
-        [self.teacherbt setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.teacherbt.layer.cornerRadius = 6;
-        self.teacherbt.titleLabel.font = [UIFont systemFontOfSize:12];
-        [self addSubview:self.teacherbt];
+//        self.teacherbt = [UIButton buttonWithType:UIButtonTypeSystem];
+//        self.teacherbt.frame = CGRectMake(40, 100, WidthFrame/2-50, 25);
+//        [self.teacherbt setTitle:@"申请成为志愿者老师" forState:UIControlStateNormal];
+//        [self.teacherbt addTarget:self action:@selector(ApplyTeacher) forControlEvents:UIControlEventTouchUpInside];
+//        self.teacherbt.backgroundColor = [UIColor colorWithHexString:@"389e98"];
+//        self.teacherbt.layer.masksToBounds = YES;
+//        [self.teacherbt setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//        self.teacherbt.layer.cornerRadius = 6;
+//        self.teacherbt.titleLabel.font = [UIFont systemFontOfSize:12];
+//        [self addSubview:self.teacherbt];
+//
+//
+//        self.workbt = [UIButton buttonWithType:UIButtonTypeCustom];
+//        self.workbt.frame = CGRectMake(WidthFrame/2+10, 100, WidthFrame/2-50, 25);
+//        [self.workbt setTitle:@"申请工作" forState:UIControlStateNormal];
+//        [self.workbt addTarget:self action:@selector(Applywork:) forControlEvents:UIControlEventTouchUpInside];
+//        self.workbt.layer.masksToBounds = YES;
+//        self.workbt.layer.cornerRadius = 6;
+//        self.workbt.backgroundColor = [UIColor colorWithHexString:@"2791cf"];
+//        self.workbt.titleLabel.font = [UIFont systemFontOfSize:12];
+//        [self addSubview:self.workbt];
         
         
-        self.workbt = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.workbt.frame = CGRectMake(WidthFrame/2+10, 100, WidthFrame/2-50, 25);
-        [self.workbt setTitle:@"申请工作" forState:UIControlStateNormal];
-        [self.workbt addTarget:self action:@selector(Applywork:) forControlEvents:UIControlEventTouchUpInside];
-        self.workbt.layer.masksToBounds = YES;
-        self.workbt.layer.cornerRadius = 6;
-        self.workbt.backgroundColor = [UIColor colorWithHexString:@"2791cf"];
-        self.workbt.titleLabel.font = [UIFont systemFontOfSize:12];
-        [self addSubview:self.workbt];
         
-        
-        
-        self.tougaobt = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.tougaobt.frame = CGRectMake(WidthFrame/4+25, 100, WidthFrame/2-50, 25);
-        [self.tougaobt setTitle:@"开始投稿" forState:UIControlStateNormal];
-        [self.tougaobt addTarget:self action:@selector(tougao) forControlEvents:UIControlEventTouchUpInside];
-        self.tougaobt.layer.masksToBounds = YES;
-        self.tougaobt.layer.cornerRadius = 6;
-        self.tougaobt.backgroundColor = [UIColor colorWithHexString:@"2791cf"];
-        self.tougaobt.titleLabel.font = [UIFont systemFontOfSize:12];
-        [self addSubview:self.tougaobt];
+//        self.tougaobt = [UIButton buttonWithType:UIButtonTypeCustom];
+//        self.tougaobt.frame = CGRectMake(WidthFrame/4+25, 100, WidthFrame/2-50, 25);
+//        [self.tougaobt setTitle:@"开始投稿" forState:UIControlStateNormal];
+//        [self.tougaobt addTarget:self action:@selector(tougao) forControlEvents:UIControlEventTouchUpInside];
+//        self.tougaobt.layer.masksToBounds = YES;
+//        self.tougaobt.layer.cornerRadius = 6;
+//        self.tougaobt.backgroundColor = [UIColor colorWithHexString:@"2791cf"];
+//        self.tougaobt.titleLabel.font = [UIFont systemFontOfSize:12];
+//        [self addSubview:self.tougaobt];
 
         
     }
 
     return self;
 }
--(void)lookDetail:(UIButton *)bt{
-    if ([self.delegate respondsToSelector:@selector(gotodetail:)]) {
-        [self.delegate gotodetail :bt];
-    }
-
-}
--(void)ApplyTeacher{
-    if ([self.delegate respondsToSelector:@selector(Applyteacher)]) {
-        [self.delegate Applyteacher];
-    }
-
-}
--(void)Applywork:(UIButton *)bt{
-    if ([self.delegate respondsToSelector:@selector(Applywork :)]) {
-        [self.delegate Applywork :bt];
-    }
-
-}
--(void)tougao{
-    if ([self.delegate respondsToSelector:@selector(Submission)]) {
-        [self.delegate Submission];
-    }
-
-}
+//-(void)lookDetail:(UIButton *)bt{
+//    if ([self.delegate respondsToSelector:@selector(gotodetail:)]) {
+//        [self.delegate gotodetail :bt];
+//    }
+//
+//}
+//-(void)ApplyTeacher{
+//    if ([self.delegate respondsToSelector:@selector(Applyteacher)]) {
+//        [self.delegate Applyteacher];
+//    }
+//
+//}
+//-(void)Applywork:(UIButton *)bt{
+//    if ([self.delegate respondsToSelector:@selector(Applywork :)]) {
+//        [self.delegate Applywork :bt];
+//    }
+//
+//}
+//-(void)tougao{
+//    if ([self.delegate respondsToSelector:@selector(Submission)]) {
+//        [self.delegate Submission];
+//    }
+//
+//}
 @end

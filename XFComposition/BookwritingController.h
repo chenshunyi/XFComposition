@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface BookwritingController : UIViewController
-
+@property (nonatomic,copy) NSString *imgUrlStr;
 @end

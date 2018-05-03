@@ -13,10 +13,16 @@
 @end
 
 @implementation NavimainViewController
-
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    
+    return UIStatusBarStyleLightContent;
+    
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    //改变导航栏（背景、字体）颜色
+    self.navigationBar.barTintColor = navigation_barColor(1);
+    self.navigationBar.barStyle = UIBarStyleBlack;
 }
 -(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated{
     if (self.viewControllers.count > 0) {

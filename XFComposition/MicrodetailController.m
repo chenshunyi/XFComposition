@@ -200,8 +200,6 @@
 //课程大纲和本课习作
 //这里可能需要判断是否登录
 -(void)Microdetailrequst0{
-    
-    
     __weak typeof (self) weakSelf = self;
     self.panduan = @"0";
     Microdetailrequst *requst = [[Microdetailrequst alloc]init];
@@ -227,9 +225,7 @@
        
 //        NSIndexSet *indexset = [NSIndexSet indexSetWithIndex:1];
 //        [self.collectionView reloadSections:indexset];
-        
             [weakSelf.collectionView reloadData];
-
     }];
 
 }
@@ -406,10 +402,6 @@
         cell.titleLabel.text = [NSString stringWithFormat:@"《%@》",self.detailmodel.className];
         cell.teacherLabel.text = [NSString stringWithFormat:@"讲课老师：%@",self.detailmodel.classMaster];
 
-//        NSString *str = [NSString stringWithFormat:@"http://xf.vqune.com%@",self.detailmodel.classPicPath];
-//        [cell.imageView sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"icon_02"] options:SDWebImageRefreshCached];
-//         NSData* imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:str]];
-//        cell.playView.playImage = [UIImage imageWithData: imageData];
         cell.sjLabel.text = [NSString stringWithFormat:@"课程时间：%@~%@",[self.detailmodel.classStartTime substringToIndex:9],[self.detailmodel.classEndTime substringToIndex:9]];
         cell.mobiaoLabel.text = [NSString stringWithFormat:@"讲课目标：%@",self.detailmodel.classTarget];
         cell.miaoshuLabel.text = [NSString stringWithFormat:@"课程描述：%@",self.detailmodel.classInfo];

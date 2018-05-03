@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 typedef void (^GetwiritlistRequst)(NSDictionary *);
 @interface CommWriteListRequst : NSObject
--(void)Comm_GetWriteListrequstWithindex :(NSString *)pageIndex withpagesiz:(NSString *)pagesize withgradid:(NSString *)gardeID withtypeid:(NSString *)typeID withishot:(NSString *)ishost withtuijian:(NSString *)istuijian withlabelid:(NSString *)labelId withkeword:(NSString *)keyWord  BlogStatic :(NSString *)BlogStatic :(GetwiritlistRequst)block;
+-(void)Comm_GetWriteListrequstWithindex :(NSNumber *)pageIndex withpagesiz:(NSString *)pagesize withgradid:(NSString *)gardeID withtypeid:(NSString *)typeID withishot:(NSString *)ishost withtuijian:(NSString *)istuijian withlabelid:(NSString *)labelId withkeword:(NSString *)keyWord  BlogStatic :(NSString *)BlogStatic :(GetwiritlistRequst)block;
 @end

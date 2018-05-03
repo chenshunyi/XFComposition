@@ -12,4 +12,5 @@ typedef void (^Volunteerrequst)(NSDictionary *);
 @interface VolunteerRequst : NSObject
 -(void)GetVolunteerRequstWithpagesize :(NSInteger )index :(NSString *)pagesize WithAcitivieTypeID:(NSString *)type :(Volunteerrequst)block;
 - (void)GetBlogHaojuWithBlogid:(NSInteger)blogid :(Volunteerrequst)block;
+- (void)GetNewsList:(Volunteerrequst)block;
 @end

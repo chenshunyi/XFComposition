@@ -64,8 +64,8 @@
     self.delegate = self;
     NSArray *classNameArray = [[NSArray alloc]init];
     NSArray *classNameArray2 = [[NSArray alloc]init];
-    classNameArray = @[@"HomePagViewController",@"CompositionLibraryViewController",@"VolunteerViewController",@"MyViewController"];
-    classNameArray2 = @[@"HomePagViewController",@"CompositionLibraryViewController",@"VolunteerViewController",@"MyViewController"];
+    classNameArray = @[@"HomeViewController",@"CompositionLibraryViewController",@"VolunteerViewController",@"MyViewController"];
+    classNameArray2 = @[@"HomeViewController",@"CompositionLibraryViewController",@"VolunteerViewController",@"MyViewController"];
     NSMutableArray *controllerArray = [NSMutableArray array];
     for (int i = 0; i<classNameArray.count; i++) {
         Class class = NSClassFromString(classNameArray[i]);

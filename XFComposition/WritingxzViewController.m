@@ -23,11 +23,16 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.webView];
+    
+    self.title = @"作文习作";
+    
+//    [self.navigationItem.leftBarButtonItem setTintColor:[UIColor whiteColor]];
+
 }
 
 -(UIWebView *)webView{
     if (!_webView) {
-        _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, WidthFrame, HeightFrame-64)];
+        _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, WidthFrame, HeightFrame)];
         _webView.delegate = self;
         NSURL *url;
         XFUserInfo *xf = [XFUserInfo getUserInfo];

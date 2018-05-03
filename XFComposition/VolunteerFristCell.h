@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface VolunteerFristCell : UICollectionViewCell
+@interface VolunteerFristCell : UICollectionViewCell 
 
 @end
