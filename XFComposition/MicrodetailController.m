@@ -124,6 +124,7 @@
         _writingView.delegate = self;
         [self.view addSubview:_writingView];
     }
+    ///
     return _writingView;
 }
 -(ShowtextView *)showtextView{
